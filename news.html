@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News & Announcements - DLS Ultra Showdown</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .news-filters {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .featured-news {
+            margin: 3rem 0;
+        }
+
+        .featured-article {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .featured-article img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .featured-article .news-card {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .breaking-ticker {
+            background: #f56565;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: ticker-slide 20s linear infinite;
+        }
+
+        .breaking-badge {
+            font-weight: 900;
+            font-size: 1.2rem;
+            white-space: nowrap;
+        }
+
+        @keyframes ticker-slide {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .news-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-card-content {
+            padding: 1.5rem;
+        }
+
+        .news-meta {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-card h3 {
+            color: #1a202c;
+            margin-bottom: 1rem;
+        }
+
+        .news-card p {
+            color: #718096;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .featured-article {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-article img {
+                height: 200px;
+            }
+
+            .news-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏆 DLS Ultra Showdown</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="standings.html">Standings</a></li>
+                <li><a href="fixtures.html">Fixtures</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="news.html" class="active">News</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>📰 News & Announcements</h1>
+
+        <div class="news-filters">
+            <input type="text" id="searchNews" class="search-box" placeholder="Search news...">
+            <select id="categoryFilter" class="filter-select">
+                <option value="">All Categories</option>
+                <option value="League News">League News</option>
+                <option value="Transfers">Transfers</option>
+                <option value="Fixtures">Fixtures</option>
+                <option value="Teams">Teams</option>
+                <option value="General">General</option>
+                <option value="Registration">Registration</option>
+                <option value="Rules">Rules</option>
+            </select>
+        </div>
+
+        <div class="featured-news" id="featuredNews" style="display: none;">
+            <h2>📌 Featured</h2>
+            <div id="featuredArticle"></div>
+        </div>
+
+        <div class="breaking-ticker" id="breakingTicker" style="display: none;">
+            <span class="breaking-badge">🔴 BREAKING</span>
+            <span id="breakingText"></span>
+        </div>
+
+        <div class="news-list" id="newsList"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DLS Ultra Showdown. All rights reserved.</p>
+    </footer>
+
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        function loadNews() {
+            const news = getNews();
+            const currentSeason = getCurrentSeason();
+            const publishedNews = news
+                .filter(n => n.seasonId === currentSeason.id && n.status === 'published')
+                .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+
+            displayFeaturedNews(publishedNews);
+            displayBreakingNews(publishedNews);
+            displayNewsList(publishedNews);
+        }
+
+        function displayFeaturedNews(news) {
+            const featured = news.find(n => n.featured);
+            const section = document.getElementById('featuredNews');
+            const article = document.getElementById('featuredArticle');
+
+            if (featured) {
+                article.innerHTML = `
+                    <div class="featured-article">
+                        ${featured.images && featured.images[featured.featuredImage] ? `
+                            <img src="${featured.images[featured.featuredImage]}" alt="Featured">
+                        ` : ''}
+                        <div class="news-card-content">
+                            <h3>${featured.title}</h3>
+                            <p class="news-meta">${featured.category} • ${new Date(featured.publishedAt).toLocaleDateString()}</p>
+                            <p>${featured.excerpt || featured.content.substring(0, 200)}</p>
+                            <a href="#" onclick="viewArticle(${featured.id})" class="btn btn-small">Read More →</a>
+                        </div>
+                    </div>
+                `;
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
+        function displayBreakingNews(news) {
+            const breaking = news.find(n => n.breaking);
+            const ticker = document.getElementById('breakingTicker');
+            if (breaking) {
+                document.getElementById('breakingText').textContent = breaking.title;
+                ticker.style.display = 'flex';
+            } else {
+                ticker.style.display = 'none';
+            }
+        }
+
+        function displayNewsList(news) {
+            const newsList = document.getElementById('newsList');
+            const search = document.getElementById('searchNews').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            let filtered = news;
+            if (search) {
+                filtered = filtered.filter(n => 
+                    n.title.toLowerCase().includes(search) || 
+                    n.content.toLowerCase().includes(search)
+                );
+            }
+            if (category) {
+                filtered = filtered.filter(n => n.category === category);
+            }
+
+            newsList.innerHTML = filtered.map(article => `
+                <div class="news-card">
+                    ${article.images && article.images[0] ? `
+                        <img src="${article.images[0]}" alt="${article.title}">
+                    ` : ''}
+                    <div class="news-card-content">
+                        <div class="news-meta">${article.category} • ${new Date(article.publishedAt).toLocaleDateString()}</div>
+                        <h3>${article.title}</h3>
+                        <p>${article.excerpt || article.content.substring(0, 150)}...</p>
+                        <a href="#" onclick="viewArticle(${article.id})" class="btn btn-small">Read More →</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewArticle(id) {
+            const news = getNews();
+            const article = news.find(n => n.id === id);
+            if (article) {
+                alert(`Article: ${article.title}\n\n${article.content}`);
+                article.views = (article.views || 0) + 1;
+                updateNews(article.id, article);
+            }
+        }
+
+        document.getElementById('searchNews').addEventListener('input', () => {
+            const news = getNews();
+            const currentSeason = getCurrentSeason();
+            const publishedNews = news.filter(n => n.seasonId === currentSeason.id && n.status === 'published');
+            displayNewsList(publishedNews);
+        });
+
+        document.getElementById('categoryFilter').addEventListener('change', () => {
+            const news = getNews();
+            const currentSeason = getCurrentSeason();
+            const publishedNews = news.filter(n => n.seasonId === currentSeason.id && n.status === 'published');
+            displayNewsList(publishedNews);
+        });
+
+        document.addEventListener('DOMContentLoaded', loadNews);
+    </script>
+</body>
+</html>

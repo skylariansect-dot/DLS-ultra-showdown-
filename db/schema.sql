@@ -1,0 +1,68 @@
+-- DLS Ultra Showdown Database Schema
+
+CREATE TABLE IF NOT EXISTS Admins (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Teams (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    badge VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Players (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    teamId INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    photo LONGTEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teamId) REFERENCES Teams(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Fixtures (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    homeTeamId INT NOT NULL,
+    awayTeamId INT NOT NULL,
+    date DATETIME NOT NULL,
+    venue VARCHAR(255),
+    status ENUM('scheduled', 'live', 'completed') DEFAULT 'scheduled',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (homeTeamId) REFERENCES Teams(id) ON DELETE CASCADE,
+    FOREIGN KEY (awayTeamId) REFERENCES Teams(id) ON DELETE CASCADE,
+    INDEX idx_date (date),
+    INDEX idx_status (status)
+);
+
+CREATE TABLE IF NOT EXISTS Results (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fixtureId INT UNIQUE NOT NULL,
+    homeGoals INT DEFAULT 0,
+    awayGoals INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (fixtureId) REFERENCES Fixtures(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Goals (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    resultId INT NOT NULL,
+    playerId INT NOT NULL,
+    minute INT,
+    assistPlayerId INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (resultId) REFERENCES Results(id) ON DELETE CASCADE,
+    FOREIGN KEY (playerId) REFERENCES Players(id) ON DELETE CASCADE,
+    FOREIGN KEY (assistPlayerId) REFERENCES Players(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS PlayerStats (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    playerId INT UNIQUE NOT NULL,
+    appearances INT DEFAULT 0,
+    goals INT DEFAULT 0,
+    assists INT DEFAULT 0,
+    FOREIGN KEY (playerId) REFERENCES Players(id) ON DELETE CASCADE
+);

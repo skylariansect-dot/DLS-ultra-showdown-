@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - DLS Ultra Showdown</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <h1 class="logo">🏆 DLS Ultra Showdown</h1>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="standings.html">Standings</a></li>
+                <li><a href="fixtures.html">Fixtures</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="admin.html" class="active">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>Admin Panel</h1>
+        <div class="admin-section">
+            <p style="color: #ff6b6b; margin-bottom: 20px;">⚠️ This section requires admin authentication.</p>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h2>👥 Manage Teams</h2>
+                    <p>Add, edit, or remove teams from the league.</p>
+                    <button class="btn-admin" onclick="alert('Admin authentication required')">Manage Teams</button>
+                </div>
+                <div class="admin-card">
+                    <h2>🎮 Manage Players</h2>
+                    <p>Add players, assign to teams, and update statistics.</p>
+                    <button class="btn-admin" onclick="alert('Admin authentication required')">Manage Players</button>
+                </div>
+                <div class="admin-card">
+                    <h2>⚽ Manage Fixtures</h2>
+                    <p>Create match fixtures, schedule dates, and set venues.</p>
+                    <button class="btn-admin" onclick="alert('Admin authentication required')">Manage Fixtures</button>
+                </div>
+                <div class="admin-card">
+                    <h2>📊 Record Results</h2>
+                    <p>Update match results, record goals, and assists.</p>
+                    <button class="btn-admin" onclick="alert('Admin authentication required')">Record Results</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 DLS Ultra Showdown. All rights reserved.</p>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
